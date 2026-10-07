@@ -1,59 +1,55 @@
-# 🥗 MacroSnap — Multimodal AI Nutrition & Calorie Intelligence Agent
+# 🥗 MacroSnap - AI Nutrition Buddy
 
-> **An end-to-end multimodal AI application that analyzes meal photos or descriptions in real-time, estimates calories and macronutrients using Google Gemini, and delivers personalized daily nutrition digests directly to your email inbox.**
+> An AI-powered nutrition tracking application that analyzes meal photos and descriptions, estimates calories and macronutrients using Google Gemini, and delivers personalized nutrition summaries via email.
 
----
+## Overview
 
-## 📌 Executive Summary
+MacroSnap is a multimodal nutrition tracking assistant built with Streamlit and Google Gemini. Users can upload a food image or describe a meal in natural language to receive calorie estimates, macronutrient breakdowns, and nutrition insights.
 
-Traditional diet-tracking applications (like MyFitnessPal or Cronometer) suffer from high user drop-off due to tedious manual search and portion logging. **MacroSnap** solves this problem by pairing **Google Gemini's Multimodal Vision API** with an interactive **Streamlit** chat interface and an automated **Gmail SMTP** notification engine. 
+The application combines image understanding, conversational AI, and email-based reporting to simplify meal tracking without requiring manual food searches or logging.
 
-Users simply take a picture of their meal or type a quick query. MacroSnap identifies the food items, provides rough caloric and macronutrient breakdowns (Protein, Carbohydrates, Fats), and compiles the day's meals into a structured digest sent directly to the user's inbox with a single click.
+## 🚀 Key Features
 
----
+- 📷 Analyze food images using Gemini's multimodal capabilities
+- 💬 Ask nutrition-related questions through a conversational interface
+- 🔢 Estimate calories, protein, carbohydrates, and fats
+- 📈 Generate personalized nutrition insights
+- 📧 Receive daily nutrition summaries via email
+- 🛡️ Nutrition-focused AI assistant with guardrails for safe interactions
 
-## 🚀 Key Highlights & Architecture
+## 🏗️ Architecture
 
 ```mermaid
 flowchart TD
-    A[User Meal Photo / Query] --> B[Streamlit Reactive Web App]
-    B --> C{Multimodal Input Handler}
-    C -->|Image Bytes + MIME| D[Gemini 3.8 Flash Vision]
-    C -->|Text Query| D
-    D --> E[Conversational Session Memory & System Guardrails]
-    E --> F[Instant Macro Breakdown UI]
-    F --> G[End of Day: Request Digest]
-    G --> H[Gemini Nutrition Summarizer]
-    H --> I[Gmail SMTP Engine (SSL 465)]
-    I --> J[User Email Inbox 📬]
-```
+    A[User Meal Photo or Query] --> B[Streamlit Web App]
+    B --> C{Input Type}
+    C -->|Image| D[Google Gemini]
+    C -->|Text| D
+    D --> E[Conversation Memory and Guardrails]
+    E --> F[Nutrition Analysis]
+    F --> G[Generate Daily Summary]
+    G --> H[Gemini Summarizer]
+    H --> I[Gmail SMTP]
+    I --> J[Email Inbox]
 
-### Core Capabilities:
-- **Zero-Shot Multimodal Recognition:** Ingests raw camera image bytes (`jpg`, `jpeg`, `png`) and identifies complex, mixed-dish meals without training custom classifiers.
-- **Strict Guardrailed Persona:** Engineered system instructions enforce that conversations stay strictly on food, fitness, and nutrition while declining off-topic queries.
-- **Conversational Memory:** Preserves multi-turn context (e.g., asking *"How much protein was in that earlier bowl?"*) within an active Gemini chat session.
-- **100% Free Notification Pipeline:** Eliminates expensive third-party SMS/WhatsApp gateways by utilizing Python's native `smtplib` over secure SSL to dispatch responsive HTML and plain-text digests.
-- **Session-Safe Client Caching:** Utilizes `@st.cache_resource` connection pooling to maintain alive API client sessions across Streamlit's reactive re-runs.
+## 💡 Core Capabilities
 
----
-
-## 🎓 Resume & Portfolio Showcase (For AI/ML Students)
-
-If you are showcasing this project on your resume or in technical interviews, you can use the following tailored bullet points:
-
-### 📄 Resume Bullet Points (STAR Format)
-- **Engineered an end-to-end multimodal nutrition tracking agent** using Google Gemini 3.8 Flash and Streamlit, enabling zero-shot food recognition and instant caloric/macronutrient breakdown from meal photographs.
-- **Architected a multi-turn conversational session pipeline** with strict prompt guardrails, handling in-memory image byte serialization and maintaining contextual chat history across application re-renders.
-- **Developed an automated notification microservice** using Python's `smtplib` and MIME multipart formatting, delivering formatted daily nutritional digests via Gmail SMTP with zero external API costs.
-- **Optimized client instantiation and state management** leveraging Streamlit caching (`@st.cache_resource`), mitigating redundant connection overhead and eliminating socket closure anomalies.
-
-### 💡 Tech Stack
-- **Languages & Frameworks:** Python 3.10+, Streamlit
-- **AI & Computer Vision:** Google Gemini 3.8 Flash (`google-genai` SDK), Multimodal Prompt Engineering
-- **Networking & Protocols:** SMTP SSL, MIME Multipart Email Protocols
-- **State & Architecture:** Streamlit Session State, Connection Pooling, Git
+- **Food Image Analysis:** Accepts meal photos (`jpg`, `jpeg`, `png`) and uses Google Gemini to identify food items and estimate nutritional information.
+- **Nutrition-Focused Assistant:** Restricts conversations to nutrition, fitness, and healthy eating topics through prompt guardrails.
+- **Conversational Memory:** Maintains context across interactions using Streamlit session state, allowing users to ask follow-up questions about previous meals.
+- **Email Nutrition Reports:** Generates and sends daily nutrition summaries through Gmail SMTP using secure SSL connections.
+- **Efficient Resource Management:** Uses `@st.cache_resource` to reuse API clients and improve application performance across Streamlit reruns.
 
 ---
+
+## 💡 Tech Stack
+
+- **Programming Language:** Python 3.10+
+- **Frontend & UI:** Streamlit
+- **AI & Vision:** Google Gemini API (`google-genai`)
+- **Email Service:** Gmail SMTP (`smtplib`, MIME)
+- **State Management:** Streamlit Session State
+- **Version Control:** Git & GitHub
 
 ## 🛠️ Project Structure
 
@@ -70,79 +66,80 @@ macrosnap/
 ```
 
 ---
+## ⚡ Quick Start
 
-## ⚡ Quickstart Guide (Local Setup)
+### 1. Clone the Repository
 
-### 1. Clone & Navigate to Project
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/poojadas100207/macrosnap.git
 cd macrosnap
 ```
 
-### 2. Set Up Virtual Environment
+### 2. Create a Virtual Environment
+
 ```bash
-# Windows PowerShell:
+# Windows
 python -m venv venv
 .\venv\Scripts\Activate.ps1
 
-# macOS / Linux:
+# macOS / Linux
 python3 -m venv venv
 source venv/bin/activate
 ```
 
 ### 3. Install Dependencies
+
 ```bash
 pip install -r requirements.txt
 ```
 
 ### 4. Configure Secrets
-1. Create a copy of the secrets template:
-   ```bash
-   cp .streamlit/secrets.toml.example .streamlit/secrets.toml
-   ```
-2. Open `.streamlit/secrets.toml` and fill in:
-   - **`GEMINI_API_KEY`**: Get a free API key from [Google AI Studio](https://aistudio.google.com).
-   - **`GMAIL_ADDRESS`**: Your Gmail account address.
-   - **`GMAIL_APP_PASSWORD`**: A 16-character Google App Password:
-     1. Visit your [Google Security Settings](https://myaccount.google.com/security).
-     2. Ensure **2-Step Verification** is turned ON.
-     3. Search for or navigate to **App passwords** ([direct link](https://myaccount.google.com/apppasswords)).
-     4. Generate an app password for "MacroSnap" and paste the 16 characters into `secrets.toml`.
 
-> ⚠️ **CRITICAL SECURITY NOTE:** Never commit `.streamlit/secrets.toml` with real credentials to GitHub. It is already included in `.gitignore`.
+Create `.streamlit/secrets.toml` using the template:
+
+```bash
+cp .streamlit/secrets.toml.example .streamlit/secrets.toml
+```
+
+Add your credentials:
+
+```toml
+GEMINI_API_KEY = "your-api-key"
+GMAIL_ADDRESS = "your-email@gmail.com"
+GMAIL_APP_PASSWORD = "your-app-password"
+```
+
+- Get a Gemini API key from: https://aistudio.google.com
+- Generate a Gmail App Password from: https://myaccount.google.com/apppasswords
+
+> ⚠️ Never commit `.streamlit/secrets.toml` to GitHub. The file contains sensitive credentials and should remain private.
 
 ### 5. Run the Application
+
 ```bash
 streamlit run app.py
 ```
-Open your browser at `http://localhost:8501`.
 
----
+Open:
 
-## 🌐 Deployment to Streamlit Community Cloud
+```
+http://localhost:8501
+```
 
-1. Push your repository to GitHub (ensure `.streamlit/secrets.toml` is NOT committed).
-2. Go to [share.streamlit.io](https://share.streamlit.io) and sign in with GitHub.
-3. Click **"New app"**, select your repository, branch, and set `app.py` as the entry point.
-4. In **Advanced Settings → Secrets**, paste the exact keys and values from your local `.streamlit/secrets.toml`:
-   ```toml
-   GEMINI_API_KEY = "your-actual-api-key"
-   GEMINI_MODEL = "gemini-3.8-flash"
-   GMAIL_ADDRESS = "your-email@gmail.com"
-   GMAIL_APP_PASSWORD = "your-16-char-app-password"
-   ```
-5. Click **Deploy**. Your app is now live with a public URL!
+## 🌐 Deployment
 
----
+### Streamlit Community Cloud
 
-## 📝 Evaluation & Submission Checklist
-- [x] Functional multimodal image + text processing
-- [x] Guardrailed system prompt scoping conversational agent to nutrition only
-- [x] Automated single-click email digest delivery
-- [x] Secrets isolated in `.streamlit/secrets.toml` and excluded in `.gitignore`
-- [x] Clear installation instructions and resume highlights
+1. Push the project to GitHub.
+2. Sign in to Streamlit Community Cloud.
+3. Create a new app and select this repository.
+4. Add the following secrets in App Settings:
 
----
+```toml
+GEMINI_API_KEY = "your-api-key"
+GMAIL_ADDRESS = "your-email@gmail.com"
+GMAIL_APP_PASSWORD = "your-app-password"
+
 
 ## 📄 License
 This project is open-source under the MIT License.
