@@ -19,31 +19,17 @@ The application combines image understanding, conversational AI, and email-based
 
 ## 🏗️ Architecture
 
-```mermaid
-
 flowchart TD
-
     A[User Meal Photo / Query] --> B[Streamlit Reactive Web App]
-
     B --> C{Multimodal Input Handler}
-
     C -->|Image Bytes + MIME| D[Gemini 3.8 Flash Vision]
-
     C -->|Text Query| D
-
     D --> E[Conversational Session Memory & System Guardrails]
-
     E --> F[Instant Macro Breakdown UI]
-
     F --> G[End of Day: Request Digest]
-
     G --> H[Gemini Nutrition Summarizer]
-
     H --> I[Gmail SMTP Engine (SSL 465)]
-
     I --> J[User Email Inbox 📬]
-
-```
 
 ## 💡 Core Capabilities
 
