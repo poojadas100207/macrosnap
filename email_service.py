@@ -4,6 +4,7 @@ Uses Python's standard smtplib and email packages to dispatch nutrition digests 
 """
 
 import smtplib
+from html import escape
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from typing import Tuple
@@ -15,6 +16,7 @@ def send_email_digest(
     summary_text: str,
     gmail_address: str,
     gmail_app_password: str,
+    app_url: str = "",
 ) -> Tuple[bool, str]:
     """
     Sends a nutrition summary digest to the specified recipient via Gmail SMTP SSL.
@@ -25,6 +27,7 @@ def send_email_digest(
         summary_text: AI-generated nutrition digest text
         gmail_address: Sender's Gmail address (from st.secrets)
         gmail_app_password: 16-character Google App Password (from st.secrets)
+        app_url: Optional link back to the MacroSnap app
 
     Returns:
         (success: bool, message: str)
@@ -55,7 +58,21 @@ def send_email_digest(
         msg.attach(MIMEText(plain_text, "plain", "utf-8"))
 
         # Formatted HTML version for modern email clients
-        formatted_html_summary = summary_text.replace("\n", "<br>")
+        summary_rows = []
+        for line in summary_text.splitlines():
+          clean_line = line.strip()
+          if clean_line:
+            summary_rows.append(
+              f'<div class="summary-row">{escape(clean_line)}</div>'
+            )
+
+        formatted_html_summary = "".join(summary_rows)
+        safe_app_url = escape(app_url.strip(), quote=True)
+        action_html = (
+          f'<a class="cta" href="{safe_app_url}">Open MacroSnap</a>'
+          if safe_app_url
+          else '<span class="cta cta-muted">Reply to this email for a follow-up</span>'
+        )
         html_content = f"""<!DOCTYPE html>
 <html>
 <head>
@@ -113,6 +130,28 @@ def send_email_digest(
       line-height: 1.7;
       color: #166534;
     }}
+    .summary-row {{
+      padding: 10px 0;
+      border-bottom: 1px solid #dcfce7;
+    }}
+    .summary-row:last-child {{
+      border-bottom: 0;
+    }}
+    .cta {{
+      display: inline-block;
+      margin-top: 8px;
+      padding: 12px 18px;
+      border-radius: 8px;
+      background: #166534;
+      color: #ffffff !important;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+    }}
+    .cta-muted {{
+      background: #dcfce7;
+      color: #166534 !important;
+    }}
     .footer {{
       background-color: #f8fafc;
       padding: 18px 24px;
@@ -135,6 +174,7 @@ def send_email_digest(
       <div class="card">
         {formatted_html_summary}
       </div>
+      {action_html}
       <p style="font-size: 13px; color: #64748b; margin-top: 20px;">
         Tip: Consistency is key. Keep snapping your meals to stay on top of your daily nutritional targets!
       </p>
@@ -149,7 +189,7 @@ def send_email_digest(
         msg.attach(MIMEText(html_content, "html", "utf-8"))
 
         clean_pwd = gmail_app_password.strip().replace(" ", "")
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=20) as server:
             server.login(gmail_address.strip(), clean_pwd)
             server.send_message(msg)
 
